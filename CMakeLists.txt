@@ -1,0 +1,26 @@
+cmake_minimum_required(VERSION 3.24)
+project(uringtier LANGUAGES CXX)
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+option(UT_SANITIZE "Build with ASan + UBSan" OFF)
+if(UT_SANITIZE)
+  add_compile_options(-fsanitize=address,undefined -fno-omit-frame-pointer)
+  add_link_options(-fsanitize=address,undefined)
+endif()
+
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(URING REQUIRED IMPORTED_TARGET liburing>=2.3)
+
+add_library(uringtier src/ring.cpp src/tier_file.cpp)
+target_include_directories(uringtier PUBLIC include)
+target_link_libraries(uringtier PUBLIC PkgConfig::URING)
+target_compile_options(uringtier PRIVATE -Wall -Wextra)
+
+find_package(GTest REQUIRED)
+enable_testing()
+add_executable(ut_tests tests/test_tier_file.cpp tests/test_ring.cpp)
+target_link_libraries(ut_tests PRIVATE uringtier GTest::gtest_main)
+target_compile_options(ut_tests PRIVATE -Wall -Wextra)
+include(GoogleTest)
+gtest_discover_tests(ut_tests)
