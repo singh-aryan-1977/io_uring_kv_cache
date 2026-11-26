@@ -1,0 +1,39 @@
+# build + test on every push and PR: GCC with ASan + UBSan.
+# correctness only; never trust timings from CI (see CLAUDE.md).
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  build-test:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install packages
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            build-essential cmake ninja-build pkg-config liburing-dev libgtest-dev
+
+      # if test fails, these tell us whether runner itself acnt do io_uring
+      - name: Runner info
+        run: |
+          uname -r
+          echo "io_uring_disabled: $(cat /proc/sys/kernel/io_uring_disabled 2>/dev/null || echo n/a)"
+          echo "memlock: $(ulimit -l) KiB"
+          df -T /tmp
+
+      - name: Configure
+        run: cmake -S . -B build -G Ninja -DUT_SANITIZE=ON
+
+      - name: Build
+        run: cmake --build build
+
+      # /tmp is on the runner's own disk, so O_DIRECT should work there
+      - name: Test
+        env:
+          UT_TEST_DIR: /tmp
+        run: ctest --test-dir build --output-on-failure
