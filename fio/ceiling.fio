@@ -1,0 +1,29 @@
+; one fio run = one point of the ceiling sweep: (pattern, block size, queue depth).
+; fio expands ${VAR} from the environment; scripts/run_fio_ceiling.sh sets them:
+;   FILE     test file on the NVMe (never inside the repo)
+;   SIZE     file size, e.g. 64g
+;   RW       randread (= loads) or randwrite (= stores)
+;   BS       block size = chunk size, e.g. 2m
+;   QD       queue depth = I/Os in flight
+;   RUNTIME  measured seconds;  RAMP  warm-up seconds (not counted)
+
+[global]
+ioengine=io_uring     ; same kernel interface as uringtier
+direct=1              ; O_DIRECT: skip the page cache, measure the drive
+registerfiles=1       ; like Ring::register_file
+fixedbufs=1           ; like Ring::register_buffers (READ_FIXED / WRITE_FIXED)
+filename=${FILE}
+size=${SIZE}
+numjobs=1             ; one thread, like the tier (one ring in vLLM's scheduler)
+time_based=1
+runtime=${RUNTIME}
+ramp_time=${RAMP}
+norandommap=1         ; pick offsets freely, like slots chosen by the index
+randrepeat=0
+percentile_list=50:99:99.9
+group_reporting=1
+
+[point]
+rw=${RW}
+bs=${BS}
+iodepth=${QD}
