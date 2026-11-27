@@ -13,8 +13,7 @@
  *      (bandwidth, iops, latency mean/p50/p99/p99.9, user + kernel CPU)
  *
  * How to run:
- *   build without sanitizers otherwise the numbers are not results worthhy sincer ASAN cehcks memory accesses, and UBSAN checks on pointer castings. Also
- *   do not build with optimizer flags such as -O2
+ *   build without sanitizers otherwise the numbers are not results worthhy sincer ASAN cehcks memory accesses, and UBSAN checks on pointer castings.
  *     cmake -S . -B /tmp/build-rel -G Ninja -DCMAKE_BUILD_TYPE=Release && cmake --build /tmp/build-rel
  *   run on fio's already-filled file so both hit the same blocks on the drive meaning its a fairer comparision. Make sure to run fio before this file on the same machine
  *     SKIP_FILL=1 /tmp/build-rel/engine_bench /mnt/nvme/fio.test results/i4i/engine.csv
