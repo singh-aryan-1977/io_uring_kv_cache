@@ -20,6 +20,8 @@ runtime=${RUNTIME}
 ramp_time=${RAMP}
 norandommap=1         ; pick offsets freely, like slots chosen by the index
 randrepeat=0
+scramble_buffers=0    ; don't rewrite the write buffer before every write: that costs fio
+                      ; user cpu engine_bench doesn't pay, and skews cores per GB/s
 percentile_list=50:99:99.9
 group_reporting=1
 

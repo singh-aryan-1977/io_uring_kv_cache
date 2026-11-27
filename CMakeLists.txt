@@ -17,6 +17,10 @@ target_include_directories(uringtier PUBLIC include)
 target_link_libraries(uringtier PUBLIC PkgConfig::URING)
 target_compile_options(uringtier PRIVATE -Wall -Wextra)
 
+add_executable(engine_bench bench/engine_bench.cpp)
+target_link_libraries(engine_bench PRIVATE uringtier)
+target_compile_options(engine_bench PRIVATE -Wall -Wextra)
+
 find_package(GTest REQUIRED)
 enable_testing()
 add_executable(ut_tests tests/test_tier_file.cpp tests/test_ring.cpp)
