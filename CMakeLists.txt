@@ -21,6 +21,11 @@ add_executable(engine_bench bench/engine_bench.cpp)
 target_link_libraries(engine_bench PRIVATE uringtier)
 target_compile_options(engine_bench PRIVATE -Wall -Wextra)
 
+find_package(Threads REQUIRED)
+add_executable(pool_bench bench/pool_bench.cpp)
+target_link_libraries(pool_bench PRIVATE uringtier Threads::Threads)
+target_compile_options(pool_bench PRIVATE -Wall -Wextra)
+
 find_package(GTest REQUIRED)
 enable_testing()
 add_executable(ut_tests tests/test_tier_file.cpp tests/test_ring.cpp)
